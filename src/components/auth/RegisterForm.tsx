@@ -3,6 +3,8 @@ import { Alert } from '@/components/common/Alert'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import type { RegisterPayload } from '@/types/auth'
+import { passwordProblem } from '@/utils/password'
+import { NewPasswordFields } from './NewPasswordFields'
 
 interface RegisterFormProps {
   onSubmit: (payload: RegisterPayload) => void
@@ -20,9 +22,14 @@ export function RegisterForm({
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [localError, setLocalError] = useState<string | null>(null)
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
+    const problem = passwordProblem(password, confirm)
+    setLocalError(problem)
+    if (problem) return
     onSubmit({ name, email, password })
   }
 
@@ -45,17 +52,19 @@ export function RegisterForm({
         onChange={(e) => setEmail(e.target.value)}
         required
       />
-      <Input
-        label="Contraseña"
-        type="password"
-        autoComplete="new-password"
-        placeholder="Mínimo 8 caracteres"
-        minLength={8}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
+      <NewPasswordFields
+        password={password}
+        confirm={confirm}
+        onPasswordChange={(value) => {
+          setPassword(value)
+          setLocalError(null)
+        }}
+        onConfirmChange={(value) => {
+          setConfirm(value)
+          setLocalError(null)
+        }}
       />
-      {error && <Alert message={error} />}
+      {(localError ?? error) && <Alert message={(localError ?? error)!} />}
       <Button type="submit" fullWidth isLoading={isLoading}>
         {submitLabel}
       </Button>

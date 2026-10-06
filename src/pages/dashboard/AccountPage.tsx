@@ -1,5 +1,6 @@
 import { CheckCircle2, MailWarning } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
+import { NewPasswordFields } from '@/components/auth/NewPasswordFields'
 import { Alert } from '@/components/common/Alert'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
@@ -9,6 +10,7 @@ import { getErrorMessage } from '@/services/api'
 import { authService } from '@/services/auth'
 import { useAuthStore } from '@/store/authStore'
 import { toast } from '@/store/toastStore'
+import { passwordProblem } from '@/utils/password'
 
 function Section({
   title,
@@ -77,8 +79,9 @@ function PasswordForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
-    if (next !== confirm) {
-      setError('Las contraseñas nuevas no coinciden')
+    const problem = passwordProblem(next, confirm)
+    if (problem) {
+      setError(problem)
       return
     }
     setIsSaving(true)
@@ -106,26 +109,21 @@ function PasswordForm() {
         onChange={(e) => setCurrent(e.target.value)}
         required
       />
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Input
-          label="Nueva contraseña"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          value={next}
-          onChange={(e) => setNext(e.target.value)}
-          required
-        />
-        <Input
-          label="Repite la nueva"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
-        />
-      </div>
+      <NewPasswordFields
+        password={next}
+        confirm={confirm}
+        onPasswordChange={(value) => {
+          setNext(value)
+          setError(null)
+        }}
+        onConfirmChange={(value) => {
+          setConfirm(value)
+          setError(null)
+        }}
+        passwordLabel="Nueva contraseña"
+        confirmLabel="Repite la nueva"
+        layout="grid"
+      />
       {error && <Alert message={error} />}
       <div className="flex justify-end">
         <Button type="submit" isLoading={isSaving}>

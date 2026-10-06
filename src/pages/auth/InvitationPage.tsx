@@ -1,6 +1,7 @@
 import { MailX, UsersRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { NewPasswordFields } from '@/components/auth/NewPasswordFields'
 import { Alert } from '@/components/common/Alert'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
@@ -14,6 +15,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useBusinessStore } from '@/store/businessStore'
 import { toast } from '@/store/toastStore'
 import type { InvitationInfo } from '@/types/team'
+import { passwordProblem } from '@/utils/password'
 
 const STATUS_MESSAGES = {
   ACCEPTED: 'Esta invitación ya fue aceptada.',
@@ -37,6 +39,7 @@ export function InvitationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
 
   /** Abre el panel ya dentro del negocio al que se unió */
   const enterBusiness = async (businessId: string) => {
@@ -59,6 +62,11 @@ export function InvitationPage() {
 
   const register = async (event: FormEvent) => {
     event.preventDefault()
+    const problem = passwordProblem(password, confirm)
+    if (problem) {
+      toast.error(problem)
+      return
+    }
     setIsSubmitting(true)
     try {
       const { accessToken, user: created, businessId } = await teamService.registerFromInvitation(
@@ -164,15 +172,12 @@ export function InvitationPage() {
             required
             autoFocus
           />
-          <Input
-            label="Crea una contraseña"
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            hint="Mínimo 8 caracteres."
+          <NewPasswordFields
+            password={password}
+            confirm={confirm}
+            onPasswordChange={setPassword}
+            onConfirmChange={setConfirm}
+            passwordLabel="Crea una contraseña"
           />
           <Button type="submit" fullWidth isLoading={isSubmitting}>
             Crear cuenta y unirme

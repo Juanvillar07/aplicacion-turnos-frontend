@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { NewPasswordFields } from '@/components/auth/NewPasswordFields'
 import { Alert } from '@/components/common/Alert'
 import { Button } from '@/components/common/Button'
-import { Input } from '@/components/common/Input'
 import { getErrorMessage } from '@/services/api'
 import { authService } from '@/services/auth'
 import { toast } from '@/store/toastStore'
+import { passwordProblem } from '@/utils/password'
 
 export function ResetPasswordPage() {
   const [params] = useSearchParams()
@@ -18,8 +19,9 @@ export function ResetPasswordPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
-    if (password !== confirm) {
-      setError('Las contraseñas no coinciden')
+    const problem = passwordProblem(password, confirm)
+    if (problem) {
+      setError(problem)
       return
     }
     setIsLoading(true)
@@ -48,27 +50,22 @@ export function ResetPasswordPage() {
     <div className="rounded-lg border border-line bg-surface p-8 shadow-xl shadow-black/20">
       <div className="mb-6">
         <h1 className="text-2xl font-medium text-fg">Nueva contraseña</h1>
-        <p className="mt-1 text-sm text-fg-muted">Elige una contraseña de al menos 8 caracteres.</p>
+        <p className="mt-1 text-sm text-fg-muted">Elige una contraseña segura y escríbela dos veces.</p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <Input
-          label="Nueva contraseña"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+        <NewPasswordFields
+          password={password}
+          confirm={confirm}
+          onPasswordChange={(value) => {
+            setPassword(value)
+            setError(null)
+          }}
+          onConfirmChange={(value) => {
+            setConfirm(value)
+            setError(null)
+          }}
+          passwordLabel="Nueva contraseña"
           autoFocus
-        />
-        <Input
-          label="Repite la contraseña"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
         />
         {error && <Alert message={error} />}
         <Button type="submit" fullWidth isLoading={isLoading}>
