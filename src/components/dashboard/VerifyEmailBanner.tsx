@@ -1,28 +1,15 @@
 import { MailWarning } from 'lucide-react'
 import { useState } from 'react'
+import { VerifyEmailModal } from '@/components/auth/VerifyEmailModal'
 import { useAuth } from '@/hooks/useAuth'
-import { getErrorMessage } from '@/services/api'
-import { authService } from '@/services/auth'
-import { toast } from '@/store/toastStore'
 
-/** Aviso (no bloquea) mientras el dueño no confirme su correo. */
+/** Aviso (no bloquea el panel) mientras la cuenta no confirme su correo. */
 export function VerifyEmailBanner() {
   const { user } = useAuth()
-  const [isSending, setIsSending] = useState(false)
+  const [open, setOpen] = useState(false)
 
   // `undefined` = dato aún no cargado del servidor: no se muestra nada
   if (!user || user.emailVerifiedAt !== null) return null
-
-  const resend = async () => {
-    setIsSending(true)
-    try {
-      toast.success(await authService.resendVerification())
-    } catch (err) {
-      toast.error(getErrorMessage(err))
-    } finally {
-      setIsSending(false)
-    }
-  }
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-amber-400/20 bg-amber-500/10 px-4 py-2.5 text-sm sm:px-8">
@@ -33,12 +20,12 @@ export function VerifyEmailBanner() {
       </span>
       <button
         type="button"
-        onClick={resend}
-        disabled={isSending}
-        className="cursor-pointer font-medium text-amber-400 underline-offset-4 hover:underline disabled:opacity-60"
+        onClick={() => setOpen(true)}
+        className="cursor-pointer font-medium text-amber-400 underline-offset-4 hover:underline"
       >
-        {isSending ? 'Enviando…' : 'Reenviar enlace'}
+        Verificar ahora
       </button>
+      <VerifyEmailModal open={open} onClose={() => setOpen(false)} />
     </div>
   )
 }

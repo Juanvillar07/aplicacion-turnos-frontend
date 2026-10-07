@@ -1,6 +1,7 @@
 import { CheckCircle2, MailWarning } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { NewPasswordFields } from '@/components/auth/NewPasswordFields'
+import { VerifyEmailModal } from '@/components/auth/VerifyEmailModal'
 import { Alert } from '@/components/common/Alert'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
@@ -136,7 +137,7 @@ function PasswordForm() {
 
 function EmailStatus() {
   const { user } = useAuth()
-  const [isSending, setIsSending] = useState(false)
+  const [verifying, setVerifying] = useState(false)
 
   if (user?.emailVerifiedAt) {
     return (
@@ -146,25 +147,15 @@ function EmailStatus() {
     )
   }
 
-  const resend = async () => {
-    setIsSending(true)
-    try {
-      toast.success(await authService.resendVerification())
-    } catch (err) {
-      toast.error(getErrorMessage(err))
-    } finally {
-      setIsSending(false)
-    }
-  }
-
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="flex items-center gap-2 text-sm text-fg">
         <MailWarning className="size-4 text-amber-400" /> {user?.email} aún no está verificado.
       </p>
-      <Button variant="secondary" size="sm" onClick={resend} isLoading={isSending}>
-        Reenviar enlace
+      <Button variant="secondary" size="sm" onClick={() => setVerifying(true)}>
+        Verificar ahora
       </Button>
+      <VerifyEmailModal open={verifying} onClose={() => setVerifying(false)} />
     </div>
   )
 }

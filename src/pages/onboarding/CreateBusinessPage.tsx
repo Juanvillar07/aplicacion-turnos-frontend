@@ -9,6 +9,7 @@ import { BackButton } from '@/components/subscription/BackButton'
 import { CheckoutForm } from '@/components/subscription/CheckoutForm'
 import { PlanPicker } from '@/components/subscription/PlanPicker'
 import { SignupSteps } from '@/components/subscription/SignupSteps'
+import { VerifyEmailStep } from '@/components/subscription/VerifyEmailStep'
 import { useAuth } from '@/hooks/useAuth'
 import { getErrorMessage } from '@/services/api'
 import { subscriptionsService } from '@/services/subscriptions'
@@ -29,8 +30,9 @@ const day = (iso: string) => formatInTz(iso, 'America/Bogota', "d 'de' MMMM")
 
 /**
  * Asistente para un usuario con sesión que va a crear un negocio. Retoma
- * donde quedó según su suscripción "suelta" (sin negocio):
- * sin suscripción → elegir plan · pendiente → pagar · activa → datos del negocio.
+ * donde quedó: correo sin verificar → código · y según su suscripción
+ * "suelta" (sin negocio): sin suscripción → elegir plan · pendiente → pagar ·
+ * activa → datos del negocio.
  * "Atrás" abre el paso anterior con `?paso=plan|pago`: cambiar de plan antes de
  * pagar, o ver el comprobante si ya pagó.
  */
@@ -144,6 +146,10 @@ export function CreateBusinessPage() {
       </div>
     )
   }
+
+  // 0. Verificar el correo (llega un código al crear la cuenta). El backend
+  //    tampoco deja pagar ni crear el negocio sin esto.
+  if (user && !user.emailVerifiedAt) return <VerifyEmailStep footer={exit} />
 
   const isPending = subscription?.status === 'PENDING_PAYMENT'
 

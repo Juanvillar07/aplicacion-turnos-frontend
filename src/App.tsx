@@ -30,7 +30,6 @@ const CreateBusinessSignupPage = page(
   'CreateBusinessSignupPage',
 )
 const ResetPasswordPage = page(() => import('@/pages/auth/ResetPasswordPage'), 'ResetPasswordPage')
-const VerifyEmailPage = page(() => import('@/pages/auth/VerifyEmailPage'), 'VerifyEmailPage')
 const AccountPage = page(() => import('@/pages/dashboard/AccountPage'), 'AccountPage')
 const CustomerDetailPage = page(() => import('@/pages/dashboard/CustomerDetailPage'), 'CustomerDetailPage')
 const CustomersPage = page(() => import('@/pages/dashboard/CustomersPage'), 'CustomersPage')
@@ -77,11 +76,12 @@ export default function App() {
           <Route path="/crear-negocio" element={<CreateBusinessSignupPage />} />
         </Route>
         <Route path="/register" element={<Navigate to="/crear-negocio" replace />} />
+        {/* La verificación ahora es con código; los enlaces de correos viejos van al panel */}
+        <Route path="/verify-email" element={<Navigate to="/app" replace />} />
 
         {/* Enlaces que llegan por correo: funcionan con o sin sesión */}
         <Route element={<AuthLayout />}>
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/invitations/:token" element={<InvitationPage />} />
         </Route>
 

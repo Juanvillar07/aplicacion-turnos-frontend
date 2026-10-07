@@ -28,17 +28,18 @@ Otros comandos: `npm run build` (compila a `dist/`) y `npm run lint` (oxlint).
 | `/crear-negocio` | público | Asistente: plan → cuenta. El pago y los datos del negocio siguen en `/onboarding` |
 | `/login`, `/forgot-password`, `/reset-password` | público | Acceso a la cuenta |
 | `/invitations/:token` | público | Aceptar una invitación al equipo |
-| `/onboarding` | con sesión | Elegir plan, pagar (simulado) y crear el negocio; retoma el paso pendiente |
+| `/onboarding` | con sesión | Verificar el correo, elegir plan, pagar (simulado) y crear el negocio; retoma el paso pendiente |
 | `/app/...` | miembros | Panel: resumen, agenda, clientes, servicios, profesionales, miembros, configuración y cuenta |
 | `/admin/...` | superadministrador | Métricas de la plataforma y gestión de negocios |
 | `/b/:slug` | clientes finales | Página pública de reservas del negocio |
 | `/cita/:token` | clientes finales | Ver, reprogramar o cancelar una cita |
 
-`/register` redirige a `/crear-negocio`: no hay registro libre.
+`/register` redirige a `/crear-negocio`: no hay registro libre. `/verify-email` redirige al panel, porque ahora la verificación es con código.
 
 ## Detalles del asistente "Crear tu negocio"
 
-- **Pasos:** Plan → Cuenta → Pago → Negocio. Cada paso tiene "Atrás", y el botón atrás del navegador funciona igual porque el paso va en la URL (`?plan=`, `?paso=`).
+- **Pasos:** Plan → Cuenta → Verificación → Pago → Negocio. Cada paso tiene "Atrás", y el botón atrás del navegador funciona igual porque el paso va en la URL (`?plan=`, `?paso=`).
+- **Verificación:** el código de 6 dígitos que llega al correo se escribe en `components/auth/VerifyEmailCode.tsx`. Las casillas avanzan solas y aceptan pegar el código, que se envía al completarse. "Reenviar código" tiene cuenta regresiva. Desde ese paso se puede corregir el correo. `hooks/useVerificationCode.ts` consulta si ya hay un código vigente antes de pedir otro, para no enviar dos correos seguidos. El aviso del panel y *Mi cuenta* usan el mismo componente en un modal (`VerifyEmailModal`).
 - **Contraseñas:** se escriben dos veces y deben tener mínimo 8 caracteres, una mayúscula y un carácter especial. `components/auth/NewPasswordFields.tsx` muestra los requisitos en vivo; la regla está en `utils/password.ts` y el backend aplica la misma.
 - **Pago simulado:** `4242 4242 4242 4242` aprueba y `4000 0000 0000 0002` rechaza, con cualquier fecha futura y cualquier CVC. La tarjeta se valida en el navegador (Luhn y fecha, en `utils/card.ts`) y a la API solo viajan la marca y los últimos 4 dígitos.
 
