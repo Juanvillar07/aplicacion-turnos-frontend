@@ -2,6 +2,7 @@ import axios from 'axios'
 import { CalendarClock, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { AddToCalendar } from '@/components/booking/AddToCalendar'
 import { BookingSummary } from '@/components/booking/BookingSummary'
 import { ReschedulePanel } from '@/components/booking/ReschedulePanel'
 import { AppointmentStatusBadge } from '@/components/agenda/AppointmentStatusBadge'
@@ -90,6 +91,21 @@ export function ManageAppointmentPage() {
           timezone={business.timezone}
         />
 
+        {appointment.canCancel && !rescheduling && (
+          <AddToCalendar
+            token={token}
+            title={`${appointment.service.name} · ${appointment.business.name}`}
+            startsAt={appointment.startsAt}
+            endsAt={appointment.endsAt}
+            details={`${appointment.service.name} con ${appointment.resource.name}. Ver o cambiar tu cita: ${window.location.origin}/cita/${token}`}
+            location={
+              [appointment.business.address, appointment.business.city]
+                .filter(Boolean)
+                .join(', ') || null
+            }
+          />
+        )}
+
         {appointment.status === 'PENDING' && (
           <p className="text-sm text-fg-muted">
             {business.name} aún debe confirmar esta cita. Te avisaremos por correo.
@@ -107,26 +123,30 @@ export function ManageAppointmentPage() {
             onCancel={() => setRescheduling(false)}
           />
         ) : (
-        <div className="flex flex-col gap-2 sm:flex-row">
-          {appointment.canReschedule && (
-            <Button variant="secondary" onClick={() => setRescheduling(true)} className="sm:flex-1">
-              <CalendarClock className="size-4" /> Reprogramar
-            </Button>
-          )}
-          {appointment.canCancel && (
-            <Button variant="danger" onClick={() => setConfirming(true)} className="sm:flex-1">
-              Cancelar cita
-            </Button>
-          )}
-          {business.phone && (
-            <a
-              href={`tel:${business.phone}`}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line-strong bg-surface-2 px-4 text-sm font-medium text-fg hover:bg-line sm:flex-1"
-            >
-              <Phone className="size-4" /> Llamar al negocio
-            </a>
-          )}
-        </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {appointment.canReschedule && (
+              <Button
+                variant="secondary"
+                onClick={() => setRescheduling(true)}
+                className="sm:flex-1"
+              >
+                <CalendarClock className="size-4" /> Reprogramar
+              </Button>
+            )}
+            {appointment.canCancel && (
+              <Button variant="danger" onClick={() => setConfirming(true)} className="sm:flex-1">
+                Cancelar cita
+              </Button>
+            )}
+            {business.phone && (
+              <a
+                href={`tel:${business.phone}`}
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line-strong bg-surface-2 px-4 text-sm font-medium text-fg hover:bg-line sm:flex-1"
+              >
+                <Phone className="size-4" /> Llamar al negocio
+              </a>
+            )}
+          </div>
         )}
 
         {appointment.canCancel && !appointment.canReschedule && !rescheduling && (

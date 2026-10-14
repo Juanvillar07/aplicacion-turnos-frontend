@@ -42,6 +42,8 @@ const SettingsPage = page(() => import('@/pages/dashboard/SettingsPage'), 'Setti
 const CreateBusinessPage = page(() => import('@/pages/onboarding/CreateBusinessPage'), 'CreateBusinessPage')
 const BookingPage = page(() => import('@/pages/public/BookingPage'), 'BookingPage')
 const ManageAppointmentPage = page(() => import('@/pages/public/ManageAppointmentPage'), 'ManageAppointmentPage')
+const ReviewPage = page(() => import('@/pages/public/ReviewPage'), 'ReviewPage')
+const ReviewsPage = page(() => import('@/pages/dashboard/ReviewsPage'), 'ReviewsPage')
 const AdminBusinessDetailPage = page(
   () => import('@/pages/admin/AdminBusinessDetailPage'),
   'AdminBusinessDetailPage',
@@ -62,6 +64,7 @@ export default function App() {
         {/* Páginas públicas para clientes finales: no requieren sesión */}
         <Route path="/b/:slug" element={<BookingPage />} />
         <Route path="/cita/:token" element={<ManageAppointmentPage />} />
+        <Route path="/resena/:token" element={<ReviewPage />} />
 
         <Route element={<GuestRoute />}>
           <Route element={<AuthLayout />}>
@@ -113,6 +116,7 @@ export default function App() {
                 <Route path="services" element={<ServicesPage />} />
                 <Route path="team" element={<ResourcesPage />} />
                 <Route path="members" element={<MembersPage />} />
+                <Route path="reviews" element={<ReviewsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 {/* Herramienta de desarrollo: no existe en el build de producción */}
                 {import.meta.env.DEV && (

@@ -1,6 +1,10 @@
 import type { BookPayload, PublicAppointment, PublicBusiness, Slot } from '@/types/booking'
 import { api } from './api'
 
+/** URL del .ics para "Agregar a mi calendario" (Apple, Outlook…) */
+export const calendarFileUrl = (token: string) =>
+  `${api.defaults.baseURL}/public/appointments/${token}/calendar.ics`
+
 export const publicBookingService = {
   async getBusiness(slug: string): Promise<PublicBusiness> {
     const { data } = await api.get<PublicBusiness>(`/public/b/${slug}`)

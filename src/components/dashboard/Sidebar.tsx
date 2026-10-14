@@ -5,6 +5,7 @@ import {
   MessageCircle,
   Settings,
   ShieldCheck,
+  Star,
   Tag,
   UserCog,
   Users,
@@ -92,6 +93,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         { to: '/app/services', label: 'Servicios', icon: Tag },
         { to: '/app/team', label: category.resourcesLabel, icon: Users },
         { to: '/app/members', label: 'Miembros', icon: UserCog },
+        { to: '/app/reviews', label: 'Reseñas', icon: Star },
         { to: '/app/settings', label: 'Configuración', icon: Settings },
         // Solo en desarrollo (npm run dev)
         ...(import.meta.env.DEV

@@ -6,9 +6,11 @@ import { Spinner } from '@/components/common/Spinner'
 import { GRID_STATUSES } from '@/constants/appointment'
 import { useActiveBusiness } from '@/hooks/useActiveBusiness'
 import { useAgenda } from '@/hooks/useAgenda'
+import { useAsync } from '@/hooks/useAsync'
 import { useAuth } from '@/hooks/useAuth'
 import { useResources } from '@/hooks/useResources'
 import { useServices } from '@/hooks/useServices'
+import { reviewsService } from '@/services/reviews'
 import { useAgendaStore } from '@/store/agendaStore'
 import { todayIn } from '@/utils/date'
 
@@ -41,6 +43,8 @@ export function OverviewPage() {
   const { resources, isLoading: loadingResources } = useResources(business.id)
   const today = useAgenda(business.id, todayIn(business.timezone))
   const pendingCount = useAgendaStore((s) => s.pendingCount)
+  const reviews = useAsync(`overview-reviews|${business.id}`, () => reviewsService.list(business.id, {}), null)
+  const rating = reviews.data?.summary
   const todayCount = today.appointments.filter((a) => GRID_STATUSES.includes(a.status)).length
 
   const activeServices = services.filter((s) => s.isActive)
@@ -90,7 +94,7 @@ export function OverviewPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             <StatCard label="Citas de hoy" value={todayCount} to="/app/agenda" />
             <StatCard label="Por confirmar" value={pendingCount} to="/app/agenda" />
             <StatCard label="Servicios activos" value={activeServices.length} to="/app/services" />
@@ -98,6 +102,20 @@ export function OverviewPage() {
               label={category.resourcesLabel}
               value={activeResources.length}
               to="/app/team"
+            />
+            <StatCard
+              label="Calificación"
+              value={
+                rating?.average ? (
+                  <span className="flex items-baseline gap-1">
+                    {rating.average.toFixed(1)}
+                    <span className="text-xs font-normal text-fg-subtle">({rating.count})</span>
+                  </span>
+                ) : (
+                  '—'
+                )
+              }
+              to="/app/reviews"
             />
           </div>
 

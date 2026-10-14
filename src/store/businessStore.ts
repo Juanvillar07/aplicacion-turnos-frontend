@@ -17,6 +17,8 @@ interface BusinessState {
   createBusiness: (payload: CreateBusinessPayload) => Promise<Business>
   updateBusiness: (payload: UpdateBusinessPayload) => Promise<Business>
   setActive: (businessId: string) => void
+  /** Reemplaza un negocio con la versión que devolvió el servidor */
+  replaceBusiness: (business: Business) => void
   reset: () => void
 }
 
@@ -64,6 +66,11 @@ export const useBusinessStore = create<BusinessState>()(
       },
 
       setActive: (businessId) => set({ activeBusinessId: businessId }),
+
+      replaceBusiness: (business) =>
+        set((state) => ({
+          businesses: state.businesses.map((b) => (b.id === business.id ? business : b)),
+        })),
 
       reset: () => set(initialState),
     }),

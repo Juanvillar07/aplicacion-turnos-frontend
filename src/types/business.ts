@@ -28,6 +28,11 @@ export interface Business {
   status: BusinessStatus
   suspendedAt: string | null
   suspendedReason: string | null
+  description: string | null
+  logoUrl: string | null
+  instagramUrl: string | null
+  facebookUrl: string | null
+  websiteUrl: string | null
   role: MemberRole
   createdAt: string
   updatedAt: string
@@ -48,8 +53,22 @@ export interface BookingSettings {
   maxDaysAhead: number
 }
 
+/** Datos de la página pública (`null` borra el valor) */
+export interface PublicProfilePayload {
+  description?: string | null
+  instagramUrl?: string | null
+  facebookUrl?: string | null
+  websiteUrl?: string | null
+}
+
 export interface UpdateBusinessPayload
-  extends Partial<CreateBusinessPayload>, Partial<BookingSettings> {
+  extends Partial<CreateBusinessPayload>, Partial<BookingSettings>, PublicProfilePayload {
   slug?: string
   whatsappEnabled?: boolean
+}
+
+export interface BusinessPhoto {
+  id: string
+  url: string
+  sortOrder: number
 }

@@ -1,6 +1,7 @@
 import { MapPin } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Logo } from '@/components/common/Logo'
+import { Stars } from '@/components/common/StarRating'
 import { CATEGORIES } from '@/constants/business'
 import type { BusinessCategory } from '@/types/business'
 
@@ -10,6 +11,8 @@ interface PublicLayoutProps {
     category: BusinessCategory
     city: string | null
     address: string | null
+    logoUrl?: string | null
+    rating?: { average: number | null; count: number }
   }
   children: ReactNode
 }
@@ -29,9 +32,17 @@ export function PublicLayout({ business, children }: PublicLayoutProps) {
       <header className="relative mx-auto w-full max-w-xl px-4 pt-8 pb-6">
         {business && Icon && (
           <div className="flex items-center gap-3.5">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-brand-hover">
-              <Icon className="size-6" />
-            </span>
+            {business.logoUrl ? (
+              <img
+                src={business.logoUrl}
+                alt={`Logo de ${business.name}`}
+                className="size-14 shrink-0 rounded-xl border border-line bg-surface object-cover"
+              />
+            ) : (
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-brand-hover">
+                <Icon className="size-6" />
+              </span>
+            )}
             <div className="min-w-0">
               <h1 className="truncate text-xl font-semibold tracking-tight text-fg">
                 {business.name}
@@ -40,6 +51,13 @@ export function PublicLayout({ business, children }: PublicLayoutProps) {
                 {location && <MapPin className="size-3.5 shrink-0" />}
                 {location || CATEGORIES[business.category].label}
               </p>
+              {business.rating && business.rating.count > 0 && (
+                <a href="#resenas" className="mt-0.5 flex items-center gap-1.5 text-xs text-fg-muted hover:text-fg">
+                  <Stars value={business.rating.average ?? 0} />
+                  <span className="font-medium text-fg">{business.rating.average?.toFixed(1)}</span>
+                  ({business.rating.count} reseña{business.rating.count === 1 ? '' : 's'})
+                </a>
+              )}
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
 import type {
   Business,
+  BusinessPhoto,
   CreateBusinessPayload,
   UpdateBusinessPayload,
 } from '@/types/business'
@@ -25,4 +26,61 @@ export const businessesService = {
     const { data } = await api.get('/businesses/slug-available', { params: { slug } })
     return data
   },
+
+  // ─── Página pública: logo y fotos ───
+
+  async uploadLogo(businessId: string, file: File): Promise<Business> {
+    const { data } = await api.post<Business>(
+      `/businesses/${businessId}/logo`,
+      toForm(file),
+      MULTIPART,
+    )
+    return data
+  },
+
+  async removeLogo(businessId: string): Promise<Business> {
+    const { data } = await api.delete<Business>(`/businesses/${businessId}/logo`)
+    return data
+  },
+
+  async photos(businessId: string): Promise<BusinessPhoto[]> {
+    const { data } = await api.get<BusinessPhoto[]>(`/businesses/${businessId}/photos`)
+    return data
+  },
+
+  async addPhoto(businessId: string, file: File): Promise<BusinessPhoto[]> {
+    const { data } = await api.post<BusinessPhoto[]>(
+      `/businesses/${businessId}/photos`,
+      toForm(file),
+      MULTIPART,
+    )
+    return data
+  },
+
+  async removePhoto(businessId: string, photoId: string): Promise<BusinessPhoto[]> {
+    const { data } = await api.delete<BusinessPhoto[]>(
+      `/businesses/${businessId}/photos/${photoId}`,
+    )
+    return data
+  },
+
+  async reorderPhotos(businessId: string, ids: string[]): Promise<BusinessPhoto[]> {
+    const { data } = await api.put<BusinessPhoto[]>(`/businesses/${businessId}/photos/order`, {
+      ids,
+    })
+    return data
+  },
+}
+
+/**
+ * Sin esto Axios convertiría el FormData a JSON (el cliente usa JSON por
+ * defecto). El navegador completa el encabezado con el "boundary".
+ */
+const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } }
+
+/** Archivo en el campo "file" (multipart/form-data) */
+function toForm(file: File) {
+  const form = new FormData()
+  form.append('file', file)
+  return form
 }

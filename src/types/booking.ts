@@ -1,6 +1,7 @@
 import type { AppointmentStatus } from './appointment'
 import type { BusinessCategory } from './business'
 import type { ResourceType } from './resource'
+import type { PublicReviewPage, RatingSummary } from './review'
 
 export interface PublicService {
   id: string
@@ -29,6 +30,15 @@ export interface PublicBusiness {
   maxDaysAhead: number
   autoConfirm: boolean
   whatsappEnabled: boolean
+  description: string | null
+  logoUrl: string | null
+  instagramUrl: string | null
+  facebookUrl: string | null
+  websiteUrl: string | null
+  photos: { id: string; url: string }[]
+  rating: RatingSummary
+  /** Primera página de reseñas publicadas */
+  reviews: PublicReviewPage
   services: PublicService[]
   resources: PublicResource[]
 }

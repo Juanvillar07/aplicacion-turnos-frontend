@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/common/Button'
 import type { PublicAppointment } from '@/types/booking'
+import { AddToCalendar } from './AddToCalendar'
 import { BookingSummary } from './BookingSummary'
 
 interface BookingConfirmationProps {
@@ -49,6 +50,20 @@ export function BookingConfirmation({ appointment, onBookAnother }: BookingConfi
         startsAt={appointment.startsAt}
         timezone={appointment.business.timezone}
       />
+
+      {appointment.manageToken && (
+        <AddToCalendar
+          token={appointment.manageToken}
+          title={`${appointment.service.name} · ${appointment.business.name}`}
+          startsAt={appointment.startsAt}
+          endsAt={appointment.endsAt}
+          details={`${appointment.service.name} con ${appointment.resource.name}. Ver o cambiar tu cita: ${window.location.origin}/cita/${appointment.manageToken}`}
+          location={
+            [appointment.business.address, appointment.business.city].filter(Boolean).join(', ') ||
+            null
+          }
+        />
+      )}
 
       <div className="rounded-lg border border-line bg-surface p-4">
         <p className="text-sm text-fg">Guarda este enlace para ver o cancelar tu cita:</p>

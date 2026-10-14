@@ -29,10 +29,11 @@ Otros comandos: `npm run build` (compila a `dist/`) y `npm run lint` (oxlint).
 | `/login`, `/forgot-password`, `/reset-password` | público | Acceso a la cuenta |
 | `/invitations/:token` | público | Aceptar una invitación al equipo |
 | `/onboarding` | con sesión | Verificar el correo, elegir plan, pagar (simulado) y crear el negocio; retoma el paso pendiente |
-| `/app/...` | miembros | Panel: resumen, agenda, clientes, servicios, profesionales, miembros, configuración y cuenta |
+| `/app/...` | miembros | Panel: resumen, agenda, clientes, servicios, profesionales, miembros, reseñas, configuración y cuenta |
 | `/admin/...` | superadministrador | Métricas de la plataforma y gestión de negocios |
 | `/b/:slug` | clientes finales | Página pública de reservas del negocio |
-| `/cita/:token` | clientes finales | Ver, reprogramar o cancelar una cita |
+| `/cita/:token` | clientes finales | Ver, reprogramar o cancelar una cita, y agregarla al calendario |
+| `/resena/:token` | clientes finales | Calificar la visita (enlace que llega al completar la cita) |
 
 `/register` redirige a `/crear-negocio`: no hay registro libre. `/verify-email` redirige al panel, porque ahora la verificación es con código.
 
@@ -42,6 +43,16 @@ Otros comandos: `npm run build` (compila a `dist/`) y `npm run lint` (oxlint).
 - **Verificación:** el código de 6 dígitos que llega al correo se escribe en `components/auth/VerifyEmailCode.tsx`. Las casillas avanzan solas y aceptan pegar el código, que se envía al completarse. "Reenviar código" tiene cuenta regresiva. Desde ese paso se puede corregir el correo. `hooks/useVerificationCode.ts` consulta si ya hay un código vigente antes de pedir otro, para no enviar dos correos seguidos. El aviso del panel y *Mi cuenta* usan el mismo componente en un modal (`VerifyEmailModal`).
 - **Contraseñas:** se escriben dos veces y deben tener mínimo 8 caracteres, una mayúscula y un carácter especial. `components/auth/NewPasswordFields.tsx` muestra los requisitos en vivo; la regla está en `utils/password.ts` y el backend aplica la misma.
 - **Pago simulado:** `4242 4242 4242 4242` aprueba y `4000 0000 0000 0002` rechaza, con cualquier fecha futura y cualquier CVC. La tarjeta se valida en el navegador (Luhn y fecha, en `utils/card.ts`) y a la API solo viajan la marca y los últimos 4 dígitos.
+
+## Página pública
+
+`/b/:slug` muestra:
+- arriba, la galería de fotos (`BusinessGallery`, con vista ampliada);
+- luego, los servicios;
+- después, "Acerca de" (`BusinessAbout`): descripción, mapa de Google por dirección con "Cómo llegar", teléfono, WhatsApp y redes;
+- al final, las reseñas (`ReviewsSection`: promedio, reparto por estrellas y "Ver más").
+
+El encabezado muestra el logo y las estrellas. Todo se configura en *Configuración → Página pública* (`PublicProfileSettings`): logo, descripción, redes y fotos (subir, ordenar y borrar). Las subidas van como `multipart/form-data`. `AddToCalendar` ofrece Google Calendar y un archivo `.ics` (Apple, Outlook).
 
 ## Estructura (por capas técnicas)
 

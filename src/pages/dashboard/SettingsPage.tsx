@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { BookingSettingsForm } from '@/components/business/BookingSettingsForm'
 import { BusinessForm } from '@/components/business/BusinessForm'
+import { PublicProfileSettings } from '@/components/business/PublicProfileSettings'
 import { SlugEditor } from '@/components/business/SlugEditor'
 import { SubscriptionSettings } from '@/components/business/SubscriptionSettings'
 import { WhatsappSettings } from '@/components/business/WhatsappSettings'
@@ -101,6 +102,15 @@ export function SettingsPage() {
           onToggle={(whatsappEnabled) => updateBusiness({ whatsappEnabled })}
         />
       </Section>
+
+      {canManage && (
+        <Section
+          title="Página pública"
+          description="Logo, descripción, redes y fotos que ven tus clientes al reservar."
+        >
+          <PublicProfileSettings key={business.id} business={business} />
+        </Section>
+      )}
 
       <Section title="Información general" description="Nombre, tipo y datos de contacto.">
         {/* key: reinicia el formulario al cambiar de negocio */}

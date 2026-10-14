@@ -3,9 +3,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { BookingConfirmation } from '@/components/booking/BookingConfirmation'
 import { BookingSummary } from '@/components/booking/BookingSummary'
+import { BusinessAbout } from '@/components/booking/BusinessAbout'
+import { BusinessGallery } from '@/components/booking/BusinessGallery'
 import { CustomerForm } from '@/components/booking/CustomerForm'
 import { DateStrip } from '@/components/booking/DateStrip'
 import { ResourcePicker } from '@/components/booking/ResourcePicker'
+import { ReviewsSection } from '@/components/booking/ReviewsSection'
 import { ServicePicker } from '@/components/booking/ServicePicker'
 import { SlotGrid } from '@/components/booking/SlotGrid'
 import { StepHeader } from '@/components/booking/StepHeader'
@@ -95,6 +98,14 @@ export function BookingPage() {
   if (!business) return <FullPageSpinner />
 
   const tz = business.timezone
+  const hasAbout = Boolean(
+    business.description ||
+      business.address ||
+      business.phone ||
+      business.instagramUrl ||
+      business.facebookUrl ||
+      business.websiteUrl,
+  )
   const resourceName =
     resourceId
       ? business.resources.find((r) => r.id === resourceId)?.name
@@ -133,6 +144,11 @@ export function BookingPage() {
     <PublicLayout business={business}>
       {step === 'service' && (
         <>
+          {business.photos.length > 0 && (
+            <div className="mb-6">
+              <BusinessGallery photos={business.photos} businessName={business.name} />
+            </div>
+          )}
           <StepHeader title="¿Qué te quieres hacer?" subtitle="Elige un servicio" current={1} total={totalSteps} />
           {business.services.length === 0 ? (
             <EmptyState
@@ -161,6 +177,21 @@ export function BookingPage() {
             >
               <MessageCircle className="size-4" /> ¿Prefieres reservar por WhatsApp?
             </a>
+          )}
+
+          {(hasAbout || business.rating.count > 0) && (
+          <div className="mt-10 flex flex-col gap-10 border-t border-line pt-8">
+            <BusinessAbout business={business} />
+            <div id="resenas" className="scroll-mt-6">
+              <ReviewsSection
+                slug={business.slug}
+                businessName={business.name}
+                timezone={business.timezone}
+                rating={business.rating}
+                firstPage={business.reviews}
+              />
+            </div>
+          </div>
           )}
         </>
       )}
